@@ -31,6 +31,10 @@
 $ npm install --save-dev @nestjs/cli
 $ mv package.json package.json.bak
 $ npx nest new .
+
+# Install TypeORM for NestJS, TypeORM core, and MySQL driver
+$ npm install @nestjs/typeorm typeorm mysql2
+
 ```
 
 

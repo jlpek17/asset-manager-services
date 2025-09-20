@@ -1,0 +1,508 @@
+/**
+ * Database Initialization Script
+ * ----------------------------
+ * This script handles the complete database construction/reconstruction process.
+ * 
+ * Order of operations:
+ * 1. Unlock foreign key checks at the start to avoid constraint violations:
+ * 2. & 3. Drop all Tables and Views due to index dependencies
+ * 4. & 5. Recreate all Tables (w. constraints) and Views 
+ * 6. Insert reference data into the database
+ * 7. Relock foreign key checks at the end
+ * 
+ * Note: Tables must be dropped before recreation to avoid
+ * constraint violations during the rebuild process.
+ */
+
+
+-- 1. UNLOCK FOREIGN_KEY_CHECKS
+SET FOREIGN_KEY_CHECKS = 0;
+
+
+-- 2. DROP ALL TABLES
+DROP TABLE IF EXISTS `domaine_critere`;
+DROP TABLE IF EXISTS `type_critere`;
+DROP TABLE IF EXISTS `critere`;
+DROP TABLE IF EXISTS `type_referent`;
+DROP TABLE IF EXISTS `referent`;
+DROP TABLE IF EXISTS `type_hebergement`;
+DROP TABLE IF EXISTS `code_pilotage_budgetaire`;
+DROP TABLE IF EXISTS `direction`;
+DROP TABLE IF EXISTS `domaine_actif`;
+DROP TABLE IF EXISTS `fournisseur`;
+DROP TABLE IF EXISTS `nature_achat`;
+DROP TABLE IF EXISTS `periode`;
+DROP TABLE IF EXISTS `tva`;
+DROP TABLE IF EXISTS `actif`;
+DROP TABLE IF EXISTS `actif_critere`;
+DROP TABLE IF EXISTS `actif_referent`;
+DROP TABLE IF EXISTS `achat`;
+
+DROP TABLE IF EXISTS `doctrine_migration_versions`;
+
+-- 3. DROP ALL VIEWS
+DROP VIEW IF EXISTS `vue_search`;
+DROP VIEW IF EXISTS `vue_somme_achat_actif_2024`;
+
+
+-- 4. RECREATE ALL TABLES
+
+-- CREATE TABLE domaine_critere (
+--     id INT AUTO_INCREMENT NOT NULL,
+--     nom_domaine VARCHAR(255) NOT NULL,
+--     description_domaine LONGTEXT DEFAULT NULL,
+--     PRIMARY KEY(id)
+-- ) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB;
+
+
+-- CREATE TABLE type_critere (
+--     id INT AUTO_INCREMENT NOT NULL,
+--     domaine_id INT NOT NULL,
+--     nom_type VARCHAR(255) NOT NULL,
+--     poids INT NOT NULL,
+--     description_type LONGTEXT DEFAULT NULL,
+--     INDEX IDX_574BEFA64272FC9F (domaine_id),
+--     PRIMARY KEY(id)
+-- ) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB;
+
+
+-- CREATE TABLE critere (
+--     id INT AUTO_INCREMENT NOT NULL,
+--     type_id INT NOT NULL,
+--     nom_critere VARCHAR(255) NOT NULL,
+--     note INT NOT NULL,
+--     INDEX IDX_7F6A8053C54C8C93 (type_id),
+--     PRIMARY KEY(id)
+-- ) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB;
+
+
+-- CREATE TABLE type_referent (
+--     id INT AUTO_INCREMENT NOT NULL,
+--     nom_type VARCHAR(50) NOT NULL,
+--     PRIMARY KEY(id)
+-- ) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB;
+
+
+-- CREATE TABLE referent (
+--     id INT AUTO_INCREMENT NOT NULL,
+--     nom VARCHAR(50) NOT NULL,
+--     prenom VARCHAR(50) NOT NULL,
+--     email VARCHAR(100) NOT NULL,
+--     PRIMARY KEY(id)
+-- ) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB;
+
+
+-- CREATE TABLE type_hebergement (
+--     id INT AUTO_INCREMENT NOT NULL,
+--     nom_type VARCHAR(50) NOT NULL,
+--     PRIMARY KEY(id)
+-- ) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB;
+
+
+-- CREATE TABLE code_pilotage_budgetaire (
+--     id INT AUTO_INCREMENT NOT NULL,
+--     code_pilotage VARCHAR(15) NOT NULL,
+--     PRIMARY KEY(id)
+-- ) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB;
+
+
+-- CREATE TABLE direction (
+--     id INT AUTO_INCREMENT NOT NULL,
+--     nom_direction VARCHAR(255) NOT NULL,
+--     PRIMARY KEY(id)
+-- ) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB;
+
+
+-- CREATE TABLE domaine_actif (
+--     id INT AUTO_INCREMENT NOT NULL,
+--     nom_domaine VARCHAR(255) NOT NULL,
+--     PRIMARY KEY(id)
+-- ) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB;
+
+
+-- CREATE TABLE fournisseur (
+--     id INT AUTO_INCREMENT NOT NULL,
+--     nom_denomination VARCHAR(255) NOT NULL,
+--     contact_nom VARCHAR(50) DEFAULT NULL,
+--     contact_prenom VARCHAR(50) DEFAULT NULL,
+--     PRIMARY KEY(id)
+-- ) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB;
+
+
+-- CREATE TABLE nature_achat (
+--     id INT AUTO_INCREMENT NOT NULL,
+--     code_nature VARCHAR(15) NOT NULL,
+--     libelle_nature VARCHAR(255) NOT NULL,
+--     PRIMARY KEY(id)
+-- ) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB;
+
+
+-- CREATE TABLE periode (
+--     id INT AUTO_INCREMENT NOT NULL,
+--     nom_periode VARCHAR(15) NOT NULL,
+--     PRIMARY KEY(id)
+-- ) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB;
+
+
+-- CREATE TABLE tva (
+--     id INT AUTO_INCREMENT NOT NULL,
+--     multiplicateur_tva NUMERIC(3, 2) NOT NULL,
+--     debut_validite DATE NOT NULL,
+--     fin_validite DATE DEFAULT NULL,
+--     PRIMARY KEY(id)
+-- ) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB;
+
+
+-- CREATE TABLE actif (
+--     id INT AUTO_INCREMENT NOT NULL,
+--     type_hebergement_id INT DEFAULT NULL,
+--     direction_id INT DEFAULT NULL,
+--     domaine_actif_id INT DEFAULT NULL,
+--     cpb_id INT DEFAULT NULL,
+--     fournisseur_id INT DEFAULT NULL,
+--     nom VARCHAR(255) NOT NULL,
+--     description VARCHAR(255) DEFAULT NULL,
+--     valeur_metier NUMERIC(3, 2) DEFAULT NULL,
+--     criticite_it NUMERIC(3, 2) DEFAULT NULL,
+--     criticite_globale NUMERIC(3, 2) DEFAULT NULL,
+--     slug VARCHAR(255) NOT NULL,
+--     created_at DATETIME NOT NULL,
+--     updated_at DATETIME NOT NULL,
+--     date_entree_run DATE DEFAULT NULL,
+--     date_sortie_run DATE DEFAULT NULL,
+--     INDEX IDX_8F52502757826F2 (type_hebergement_id),
+--     INDEX IDX_8F52502AF73D997 (direction_id),
+--     INDEX IDX_8F52502F78042FD (domaine_actif_id),
+--     INDEX IDX_8F52502CE5F1F32 (cpb_id),
+--     INDEX IDX_8F52502670C757F (fournisseur_id),
+--     UNIQUE INDEX UNIQ_8F52502989D9B62 (slug),
+--     PRIMARY KEY(id)
+-- ) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB;
+
+
+-- CREATE TABLE actif_critere (
+--     actif_id INT NOT NULL,
+--     critere_id INT NOT NULL,
+--     INDEX IDX_A1ADB30340E1C722 (actif_id),
+--     INDEX IDX_A1ADB3039E5F45AB (critere_id),
+--     PRIMARY KEY(actif_id, critere_id)
+-- ) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB;
+
+
+-- CREATE TABLE actif_referent (
+--     referent_id INT NOT NULL,
+--     type_referent_id INT NOT NULL,
+--     actif_id INT NOT NULL,
+--     INDEX IDX_952F3AAB35E47E35 (referent_id),
+--     INDEX IDX_952F3AAB7EFDA9A4 (type_referent_id),
+--     INDEX IDX_952F3AAB40E1C722 (actif_id),
+--     PRIMARY KEY(referent_id, type_referent_id, actif_id)
+-- ) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB;
+
+
+-- CREATE TABLE achat (
+--     id INT AUTO_INCREMENT NOT NULL,
+--     nature_achat_id INT DEFAULT NULL,
+--     periode_id INT DEFAULT NULL,
+--     tva_id INT NOT NULL,
+--     actif_id INT NOT NULL,
+--     num_buyer VARCHAR(15) DEFAULT NULL,
+--     num_cde VARCHAR(15) DEFAULT NULL,
+--     date_da DATE DEFAULT NULL,
+--     montant_ttc NUMERIC(12, 4) DEFAULT NULL,
+--     debut_quote_part DATE DEFAULT NULL,
+--     fin_quote_part DATE DEFAULT NULL,
+--     cout_ht_quote_part NUMERIC(12, 4) DEFAULT NULL,
+--     cout_ttc_quote_part NUMERIC(12, 4) DEFAULT NULL,
+--     created_at DATETIME NOT NULL,
+--     updated_at DATETIME NOT NULL,
+--     INDEX IDX_26A984568347407 (nature_achat_id),
+--     INDEX IDX_26A98456F384C1CF (periode_id),
+--     INDEX IDX_26A984564D79775F (tva_id),
+--     INDEX IDX_26A9845640E1C722 (actif_id),
+--     PRIMARY KEY(id)
+-- ) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB;
+
+
+-- CREATE MIGRATION TABLE AND INSERT NECESSARY MIGRATION RECORD
+CREATE TABLE doctrine_migration_versions (
+    version VARCHAR(191) NOT NULL,
+    executed_at DATETIME DEFAULT NULL,
+    execution_time INT DEFAULT NULL,
+    PRIMARY KEY(version)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB;
+
+-- TECHNICAL DATA TO INSERT IN THE MIGRATION TABLE --
+INSERT INTO `doctrine_migration_versions` VALUES ('DoctrineMigrations\\Version20250125230924',NULL,NULL);
+
+
+-- ADD CONSTRAINTS
+ALTER TABLE achat ADD CONSTRAINT FK_26A984568347407 FOREIGN KEY (nature_achat_id) REFERENCES nature_achat (id);
+ALTER TABLE achat ADD CONSTRAINT FK_26A98456F384C1CF FOREIGN KEY (periode_id) REFERENCES periode (id);
+ALTER TABLE achat ADD CONSTRAINT FK_26A984564D79775F FOREIGN KEY (tva_id) REFERENCES tva (id);
+ALTER TABLE achat ADD CONSTRAINT FK_26A9845640E1C722 FOREIGN KEY (actif_id) REFERENCES actif (id);
+ALTER TABLE actif ADD CONSTRAINT FK_8F52502757826F2 FOREIGN KEY (type_hebergement_id) REFERENCES type_hebergement (id);
+ALTER TABLE actif ADD CONSTRAINT FK_8F52502AF73D997 FOREIGN KEY (direction_id) REFERENCES direction (id);
+ALTER TABLE actif ADD CONSTRAINT FK_8F52502F78042FD FOREIGN KEY (domaine_actif_id) REFERENCES domaine_actif (id);
+ALTER TABLE actif ADD CONSTRAINT FK_8F52502CE5F1F32 FOREIGN KEY (cpb_id) REFERENCES code_pilotage_budgetaire (id);
+ALTER TABLE actif ADD CONSTRAINT FK_8F52502670C757F FOREIGN KEY (fournisseur_id) REFERENCES fournisseur (id);
+ALTER TABLE actif_critere ADD CONSTRAINT FK_A1ADB30340E1C722 FOREIGN KEY (actif_id) REFERENCES actif (id) ON DELETE CASCADE;
+ALTER TABLE actif_critere ADD CONSTRAINT FK_A1ADB3039E5F45AB FOREIGN KEY (critere_id) REFERENCES critere (id) ON DELETE CASCADE;
+ALTER TABLE actif_referent ADD CONSTRAINT FK_952F3AAB35E47E35 FOREIGN KEY (referent_id) REFERENCES referent (id);
+ALTER TABLE actif_referent ADD CONSTRAINT FK_952F3AAB7EFDA9A4 FOREIGN KEY (type_referent_id) REFERENCES type_referent (id);
+ALTER TABLE actif_referent ADD CONSTRAINT FK_952F3AAB40E1C722 FOREIGN KEY (actif_id) REFERENCES actif (id);
+ALTER TABLE critere ADD CONSTRAINT FK_7F6A8053C54C8C93 FOREIGN KEY (type_id) REFERENCES type_critere (id);
+ALTER TABLE type_critere ADD CONSTRAINT FK_574BEFA64272FC9F FOREIGN KEY (domaine_id) REFERENCES domaine_critere (id);
+
+
+-- 5. RECREATE ALL VIEWS
+CREATE VIEW vue_search AS 
+SELECT 
+    ROW_NUMBER() OVER (ORDER BY nom) AS id,
+    item_id,
+    nom,
+    origin
+FROM 
+    (SELECT 
+        slug AS item_id,
+        nom,
+        'Actif' AS origin
+     FROM actif
+     UNION 
+     SELECT 
+        id AS item_id,
+        CONCAT(nom, ' ', prenom) AS nom,
+        'Referent' AS origin
+     FROM referent
+    ) AS combined;
+
+
+CREATE VIEW vue_somme_achat_actif_2024 AS
+SELECT 
+    actif.id AS id,
+    actif.nom AS nom,
+    achat.actif_id AS actif_id,
+    achat.nature_achat_id AS nature_achat_id,
+    nature_achat.libelle_nature AS libelle_nature,
+    nature_achat.code_nature AS code_nature,
+    YEAR(achat.debut_quote_part) AS annee_debut_quote_part,
+    SUM(achat.cout_ttc_quote_part) AS nature_cout_ttc_quote_part
+FROM
+    actif
+    LEFT JOIN achat ON achat.actif_id = actif.id
+    LEFT JOIN nature_achat ON nature_achat.id = achat.nature_achat_id
+GROUP BY 
+    actif.id, 
+    achat.nature_achat_id, 
+    YEAR(achat.debut_quote_part);
+
+
+-- 6. INSERT REFERENCE DATA
+
+/**
+ * These are the reference data that will be inserted into the database.
+ * from Dump completed on 2025-01-06 11:33:57
+ * ----------------------------
+ */
+
+--
+-- Dumping data for table `domaine_critere`
+--
+INSERT INTO `domaine_critere` VALUES 
+(1,'Valeur métier',NULL),
+(2,'Criticité IT',NULL);
+
+
+--
+-- Dumping data for table `type_critere`
+--
+INSERT INTO `type_critere` VALUES 
+(1,1,'Exigence réglementaire',5,NULL),
+(2,1,'Impact activité utilisateurs (en cas de rupture)',3,NULL),
+(3,1,'Nombre de sociétés utilisatrices',1,NULL),
+(4,1,'Nombre d''utilisateurs',2,NULL),
+(5,1,'Sensibilité politique',2,NULL),
+(6,1,'Pérénité de l''Actif dans l''entreprise',2,NULL),
+(7,1,'Couverture des besoins / Potentiel de l''outil',2,NULL),
+(8,1,'Impact sur la performance globale de l''entreprise / enjeux stratégique',2,NULL),
+(9,2,'Compétence externe et/ou interne',1,NULL),
+(10,2,'Conformité sécurité',5,NULL),
+(11,2,'Présence d''incidents P0, P1 et P2',1,NULL),
+(12,2,'Conformité réglementaire (RGPD)',5,NULL),
+(13,2,'Dettes techniques et/ou fonctionnelles',1,NULL),
+(14,2,'Qualité relation fournisseur',3,NULL);
+
+
+--
+-- Dumping data for table `critere`
+--
+INSERT INTO `critere` VALUES 
+(1,1,'Répond à une exigence réglementaire',3),
+(2,1,'Contribue aux exigences réglementaires',1),
+(3,1,'Sans lien avec les exigences réglementaires',0),
+(4,2,'Pas d''impact',0),
+(5,2,'Faible',1),
+(6,2,'Moyen',2),
+(7,2,'Fort',3),
+(8,3,'1',1),
+(9,3,'> 1',2),
+(10,4,'<10',0),
+(11,4,'<100',1),
+(12,4,'Entre 100 et 1000',2),
+(13,4,'>=1000',3),
+(14,5,'O',3),
+(15,5,'N',0),
+(16,6,'Pérenne',3),
+(17,6,'Non pérenne + solution de remplacement facile à trouver',1),
+(18,6,'Non pérenne + solution de remplacement difficile à trouver',0),
+(19,7,'Fonctionnalités présentes et installées',3),
+(20,7,'Fonctionnalités présentes et partiellement installées',1),
+(21,7,'Fonctionnalités partiellement présentes',0),
+(22,8,'Fort',3),
+(23,8,'Moyen',1),
+(24,8,'Faible',0),
+(25,9,'Non Applicable',0),
+(26,9,'Renforts externe ET interne',0),
+(27,9,'Pas de renfort externe',1),
+(28,9,'Pas de renfort interne',2),
+(29,9,'Ni externe, ni interne',3),
+(30,10,'Non Applicable',0),
+(31,10,'Conforme',0),
+(32,10,'Risque faible',1),
+(33,10,'Risque avec réserve',2),
+(34,10,'Risque fort',3),
+(35,11,'Aucun incident',0),
+(36,11,'Faible (Px < 5)',1),
+(37,11,'Moyen (Px > 5  et <= 20)',2),
+(38,11,'Fort (Px > 20)',3),
+(39,12,'O',0),
+(40,12,'N',3),
+(41,13,'Technique ET fonctionnelle',3),
+(42,13,'Technique OU fonctionnelle',2),
+(43,13,'Aucune Dette',0),
+(44,14,'Bonne relation',1),
+(45,14,'Relation à améliorer',2),
+(46,14,'Relation conflictuelle ou absente',3);
+
+
+--
+-- Dumping data for table `type_referent`
+--
+INSERT INTO `type_referent` VALUES 
+(1,'Product Owner'),
+(2,'Business Owner'),
+(3,'Référent Achat');
+
+
+--
+-- Dumping data for table `type_hebergement`
+--
+INSERT INTO `type_hebergement` VALUES 
+(1,'Saas'),
+(2,'On Premise');
+
+
+--
+-- Dumping data for table `code_pilotage_budgetaire`
+--
+INSERT INTO `code_pilotage_budgetaire` VALUES 
+(1,'MADPEF'),(2,'GESPARTI'),(3,'SOLVA'),(4,'CONSOLID'),(5,'CENTRISQ'),
+(6,'MADSUPPO'),(7,'GOOGLE'),(8,'LOGBUR'),(9,'SECURITE'),(10,'GESTPARC'),
+(11,'MADMET'),(12,'AUTTAXES'),(13,'JALIOS'),(14,'GESCONT'),(15,'LOGENVTV'),
+(16,'GESCOMM'),(17,'GCOMMINT'),(18,'MCV'),(19,'GESCE'),(20,'ACHAT'),
+(21,'MADIARD'),(22,'MADPEFCP'),(23,'COMPTA'),(24,'NDF'),(25,'ITESOFT'),
+(26,'BUDGET'),(27,'LABLAF'),(28,'RGPD'),(29,'GESRISQ'),(30,'MADRH'),
+(31,'GESTALEN'),(32,'GESTEMPS'),(33,'GESRH'),(34,'GESPARCI'),(35,'GESSTOCK'),
+(36,'STOARCH');
+
+
+--
+-- Dumping data for table `direction`
+--
+INSERT INTO `direction` VALUES 
+(1,'AEMA'),
+(2,'Direction Digital Systèmes Informations'),
+(3,'Direction Engagement'),
+(4,'Direction Finance Pilotage Economique et Risques'),
+(5,'Direction Réponses Besoins Sociétaires et Innovation'),
+(6,'Direction Ressouces Humaines'),
+(7,'Direction Stratégie et Performance'),
+(8,'Macif CE'),
+(9,'Macif Investissement');
+
+
+--
+-- Dumping data for table `domaine_actif`
+--
+INSERT INTO `domaine_actif` VALUES 
+(1,'Achats'),
+(2,'Action Mutualiste'),
+(3,'Activité et Résultat Technique'),
+(4,'Actuariat et Reporting réglementaire'),
+(5,'Administration BHI'),
+(6,'Comité d''Entreprise'),
+(7,'Communication'),
+(8,'Comptabilité'),
+(9,'Conformité'),
+(10,'Consolidation et Comptabilité'),
+(11,'Contrôle de Gestion'),
+(12,'Contrôle Financier'),
+(13,'Data Office'),
+(14,'DDSI'),
+(15,'Engagement'),
+(16,'Fondation Macif'),
+(17,'Formation'),
+(18,'Gestion Activités RH'),
+(19,'Gestion de la Paie'),
+(20,'Gestion des Bâtiments'),
+(21,'Gestion des Baux'),
+(22,'Gestion des Capteurs'),
+(23,'Gestion des données RH'),
+(24,'Gestion des Plans et Parc'),
+(25,'Gestion des Stock'),
+(26,'Gestion des Talents'),
+(27,'Gestion des Temps'),
+(28,'Gestion ESG'),
+(29,'IARD'),
+(30,'Juridique'),
+(31,'Macif Centre de Voile'),
+(32,'Organisation et Gestion Documentaire'),
+(33,'Pilotage des risques'),
+(34,'QVCT'),
+(35,'Recrutement et Onboarding'),
+(36,'Risques et Contrôle Permanent'),
+(37,'Trésorerie');
+
+
+--
+-- Dumping data for table `nature_achat`
+--
+INSERT INTO `nature_achat` VALUES 
+(1,'RH-AHSM-B','RUN Historique - Abonnement, Hébergement, Soucription ou Maintenance budgété'),
+(2,'RH-AHSM-NB','RUN Historique - Abonnement, Hébergement, Soucription ou Maintenance non budgété (oubli)'),
+(3,'RH-CO-B','RUN Historique - Croissance organique budgétée'),
+(4,'RH-CO-NB','RUN Historique - Croissance organique non budgétée'),
+(5,'RN-AHSM-B','RUN Nouveauté - Abonnement, Hébergement, Soucription ou Maintenance budgété (après projet)'),
+(6,'RN-AHSM-NB','RUN Nouveauté - Abonnement, Hébergement, Soucription ou Maintenance non budgété (hors projet ou Oubli)'),
+(7,'RN-AL-NB','RUN Nouveautés - Achat de Licences non budgété'),
+(8,'P-AHSM','PROJETS - Abonnement, Hébergement, Soucription ou Maintenance'),
+(9,'P-AL','PROJETS - Achats de Licences');
+
+
+--
+-- Dumping data for table `periode`
+--
+INSERT INTO `periode` VALUES 
+(1,'< FC#2'),
+(2,'< FC#3');
+
+
+--
+-- Dumping data for table `tva`
+--
+INSERT INTO `tva` VALUES 
+(1,1.20,'2014-01-01',NULL);
+
+
+-- 7. RELOCK FOREIGN_KEY_CHECKS
+SET FOREIGN_KEY_CHECKS = 1;
